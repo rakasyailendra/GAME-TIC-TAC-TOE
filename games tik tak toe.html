@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Tic-Tac-Toe By Raka</h1>
+    <div id="board"></div>
+    <p id="status">Player X's turn</p>
+    <button id="restart">Restart Game</button>
+
+    <script>
+        const SIZE = 3;
+        const boardElement = document.getElementById('board');
+        const statusElement = document.getElementById('status');
+        const restartButton = document.getElementById('restart');
+        
+        let board = Array(SIZE).fill().map(() => Array(SIZE).fill(''));
+        let currentPlayer = 'X';
+
+        function createBoard() {
+            boardElement.innerHTML = '';
+            for (let i = 0; i < SIZE; i++) {
+                const row = document.createElement('div');
+                row.className = 'row';
+                for (let j = 0; j < SIZE; j++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.dataset.row = i;
+                    cell.dataset.col = j;
+                    cell.addEventListener('click', handleMove);
+                    row.appendChild(cell);
+                }
+                boardElement.appendChild(row);
+            }
+        }
+
+        function handleMove(e) {
+            const row = e.target.dataset.row;
+            const col = e.target.dataset.col;
+
+            if (board[row][col] || checkWin() || checkDraw()) {
+                return;
+            }
+
+            board[row][col] = currentPlayer;
+            e.target.textContent = currentPlayer;
+
+            if (checkWin()) {
+                statusElement.textContent = `Player ${currentPlayer} wins!`;
+                return;
+            }
+
+            if (checkDraw()) {
+                statusElement.textContent = "It's a draw!";
+                return;
+            }
+
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            statusElement.textContent = `Player ${currentPlayer}'s turn`;
+        }
+
+        function checkWin() {
+            for (let i = 0; i < SIZE; i++) {
+                if (board[i].every(cell => cell === currentPlayer)) return true;
+                if (board.map(row => row[i]).every(cell => cell === currentPlayer)) return true;
+            }
+            if (board.map((row, i) => row[i]).every(cell => cell === currentPlayer)) return true;
+            if (board.map((row, i) => row[SIZE - 1 - i]).every(cell => cell === currentPlayer)) return true;
+            return false;
+        }
+
+        function checkDraw() {
+            return board.flat().every(cell => cell);
+        }
+
+        function restartGame() {
+            board = Array(SIZE).fill().map(() => Array(SIZE).fill(''));
+            currentPlayer = 'X';
+            statusElement.textContent = "Player X's turn";
+            createBoard();
+        }
+
+        restartButton.addEventListener('click', restartGame);
+
+        createBoard();
+    </script>
+</body>
+</html>
